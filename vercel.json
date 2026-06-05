@@ -1,0 +1,20 @@
+{
+  "crons": [
+    {
+      "path": "/api/arena/run-market-update",
+      "schedule": "*/30 * * * *"
+    },
+    {
+      "path": "/api/arena/run-cycle",
+      "schedule": "5,35 * * * *"
+    },
+    {
+      "path": "/api/arena/run-scoring",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/arena/accrue-interest",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}

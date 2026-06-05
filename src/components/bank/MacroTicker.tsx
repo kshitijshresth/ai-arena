@@ -1,4 +1,6 @@
-import { macroIndicators } from "@/data/mockData";
+import { macroIndicators as mockMacroIndicators } from "@/data/mockData";
+import { useMarketSnapshot } from "@/hooks/useArenaData";
+import { adaptMacroIndicator } from "@/lib/adapters";
 
 function fmtAgo(ts: number) {
   const s = Math.floor((Date.now() - ts) / 1000);
@@ -8,6 +10,10 @@ function fmtAgo(ts: number) {
 }
 
 export function MacroTicker() {
+  const { data: liveData } = useMarketSnapshot();
+  const liveMacros = liveData?.snapshot?.macroIndicators?.map(adaptMacroIndicator) ?? [];
+  const macroIndicators = liveMacros.length > 0 ? liveMacros : mockMacroIndicators;
+
   return (
     <div className="border border-[#2a2a2a] bg-[#111]">
       <div className="px-3 py-2 border-b border-[#2a2a2a] text-[#4a9eff] uppercase-label text-[11px]">MACRO</div>

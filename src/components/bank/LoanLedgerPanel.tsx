@@ -1,8 +1,13 @@
-import { loans } from "@/data/mockData";
+import { loans as mockLoans } from "@/data/mockData";
+import { useLoans } from "@/hooks/useArenaData";
+import { adaptLoan } from "@/lib/adapters";
 
 const STATUS_COLOR = { ACTIVE: "text-[#4a9eff] border-[#4a9eff]", REPAID: "text-[#00ff88] border-[#00ff88]", DEFAULTED: "text-[#ff3b3b] border-[#ff3b3b]" };
 
 export function LoanLedgerPanel({ full = false }: { full?: boolean }) {
+  const { data: liveData } = useLoans();
+  const liveLoans = liveData?.loans?.map(adaptLoan) ?? [];
+  const loans = liveLoans.length > 0 ? liveLoans : mockLoans;
   const outstanding = loans.filter(l => l.status === "ACTIVE").reduce((s, l) => s + l.amount, 0);
   return (
     <div className="border border-[#2a2a2a] bg-[#111]">

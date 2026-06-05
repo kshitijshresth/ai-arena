@@ -1,12 +1,17 @@
 import { useState } from "react";
-import { commentary } from "@/data/mockData";
+import { commentary as mockCommentary } from "@/data/mockData";
 import type { Commentary } from "@/types";
+import { useCommentary } from "@/hooks/useArenaData";
+import { adaptCommentary } from "@/lib/adapters";
 
 function fmtTime(ts: number) {
   return new Date(ts).toISOString().slice(11, 16);
 }
 
 export function CommentaryFeed({ full = false }: { full?: boolean }) {
+  const { data: liveData } = useCommentary();
+  const liveCommentary = liveData?.commentary?.map(adaptCommentary) ?? [];
+  const commentary = liveCommentary.length > 0 ? liveCommentary : mockCommentary;
   const [open, setOpen] = useState<Commentary | null>(null);
   return (
     <>

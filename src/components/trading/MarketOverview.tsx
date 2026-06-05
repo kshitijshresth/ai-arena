@@ -1,10 +1,16 @@
 import { LineChart, Line, ResponsiveContainer } from "recharts";
 import { marketAssets } from "@/data/mockData";
+import { useMarketSnapshot } from "@/hooks/useArenaData";
+import { adaptMarketAsset } from "@/lib/adapters";
 
 export function MarketOverview() {
+  const { data: liveData } = useMarketSnapshot();
+  const liveAssets = liveData?.snapshot?.assets?.map(adaptMarketAsset) ?? [];
+  const displayAssets = liveAssets.length > 0 ? liveAssets.slice(0, 6) : marketAssets.slice(0, 6);
+
   return (
     <div className="grid grid-cols-3 gap-px bg-[#2a2a2a] border border-[#2a2a2a]">
-      {marketAssets.slice(0, 6).map(a => {
+      {displayAssets.map(a => {
         const up = a.changePct >= 0;
         return (
           <div key={a.symbol} className="bg-[#111] p-3">

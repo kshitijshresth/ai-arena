@@ -1,7 +1,19 @@
 import { Link } from "@tanstack/react-router";
-import { loans, commentary } from "@/data/mockData";
+import { loans as mockLoans, commentary as mockCommentary } from "@/data/mockData";
+import { useLoans } from "@/hooks/useArenaData";
+import { useCommentary } from "@/hooks/useArenaData";
+import { adaptLoan, adaptCommentary } from "@/lib/adapters";
+import { CENTRAL_BANK_MODEL } from "@/lib/models";
 
 export function CentralBankStatus() {
+  const { data: liveLoansData } = useLoans();
+  const { data: liveCommentaryData } = useCommentary();
+  const liveLoans = liveLoansData?.loans?.map(adaptLoan) ?? [];
+  const liveCommentary = liveCommentaryData?.commentary?.map(adaptCommentary) ?? [];
+
+  const loans = liveLoans.length > 0 ? liveLoans : mockLoans;
+  const commentary = liveCommentary.length > 0 ? liveCommentary : mockCommentary;
+
   const outstanding = loans.filter(l => l.status === "ACTIVE").reduce((s, l) => s + l.amount, 0);
   const today = loans.filter(l => Date.now() - l.issuedAt < 24 * 3600_000);
   const approved = today.filter(l => l.approved).length;
@@ -14,7 +26,7 @@ export function CentralBankStatus() {
         <span className="border border-[#a855f7] text-[#a855f7] px-1.5 py-0 text-[9px]">ACTIVE</span>
       </div>
       <div className="p-3 space-y-2 text-[11px]">
-        <div className="flex justify-between"><span className="text-[#888] uppercase-label text-[10px]">MODEL</span><span>GEMMA2-9B</span></div>
+        <div className="flex justify-between"><span className="text-[#888] uppercase-label text-[10px]">MODEL</span><span>{CENTRAL_BANK_MODEL.name}</span></div>
         <div className="flex justify-between"><span className="text-[#888] uppercase-label text-[10px]">OUTSTANDING</span><span className="text-[#f5a623] tabular-nums">${outstanding.toFixed(2)}</span></div>
         <div className="flex justify-between"><span className="text-[#888] uppercase-label text-[10px]">APPROVED TODAY</span><span className="text-[#00ff88] tabular-nums">{approved}</span></div>
         <div className="flex justify-between"><span className="text-[#888] uppercase-label text-[10px]">REJECTED TODAY</span><span className="text-[#ff3b3b] tabular-nums">{rejected}</span></div>

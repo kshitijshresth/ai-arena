@@ -3,7 +3,9 @@ import { useState } from "react";
 import { TopBar } from "@/components/layout/TopBar";
 import { LoanLedgerPanel } from "@/components/bank/LoanLedgerPanel";
 import { CommentaryFeed } from "@/components/bank/CommentaryFeed";
+import { MarketStatusBar } from "@/components/trading/MarketStatusBar";
 import { loans, models } from "@/data/mockData";
+import { CENTRAL_BANK_MODEL } from "@/lib/models";
 
 export const Route = createFileRoute("/central-bank")({
   head: () => ({
@@ -46,8 +48,8 @@ function CentralBank() {
       <div className="px-4 py-3 border-b border-[#2a2a2a] flex items-center gap-4">
         <Link to="/" className="text-[#888] hover:text-white text-[11px] uppercase-label">← BACK</Link>
         <span className="text-[20px] text-[#a855f7] uppercase-label">CENTRAL BANK</span>
-        <span className="text-[#888]">GEMMA2-9B</span>
-        <span className="border border-[#00ff88] text-[#00ff88] px-2 py-0.5 text-[10px] uppercase-label">GROQ</span>
+        <span className="text-[#888]">{CENTRAL_BANK_MODEL.name}</span>
+        <span className="border border-[#00ff88] text-[#00ff88] px-2 py-0.5 text-[10px] uppercase-label">{CENTRAL_BANK_MODEL.provider.toUpperCase()}</span>
       </div>
 
       <div className="p-3 space-y-3">
@@ -90,6 +92,7 @@ function CentralBank() {
           ))}
         </div>
       </div>
+      <MarketStatusBar />
     </div>
   );
 }

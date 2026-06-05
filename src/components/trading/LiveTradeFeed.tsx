@@ -1,12 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { models } from "@/data/mockData";
 import type { Trade } from "@/types";
+import { useLiveTrades } from "@/hooks/useArenaData";
+import { adaptTrade } from "@/lib/adapters";
 
 function fmtTime(ts: number) {
   return new Date(ts).toISOString().slice(11, 19);
 }
 
 export function LiveTradeFeed() {
+  const { data: liveData } = useLiveTrades();
+  const liveTrades = liveData?.trades?.map(adaptTrade) ?? [];
+
   const initial = useMemo(() => {
     return models.flatMap(m => m.trades).sort((a, b) => b.timestamp - a.timestamp).slice(0, 50);
   }, []);
@@ -14,6 +19,10 @@ export function LiveTradeFeed() {
   const [paused, setPaused] = useState(false);
 
   useEffect(() => {
+    if (liveTrades.length > 0) {
+      setFeed(liveTrades.slice(0, 50));
+      return;
+    }
     if (paused) return;
     const id = setInterval(() => {
       // synthesize a new trade
@@ -22,7 +31,7 @@ export function LiveTradeFeed() {
       setFeed(prev => [newTrade, ...prev].slice(0, 50));
     }, 3500);
     return () => clearInterval(id);
-  }, [paused]);
+  }, [paused, liveTrades]);
 
   return (
     <div className="border border-[#2a2a2a] bg-[#111]"

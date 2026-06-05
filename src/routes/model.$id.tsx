@@ -1,8 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { models, loans } from "@/data/mockData";
+import { models, loans as mockLoans } from "@/data/mockData";
 import { TopBar } from "@/components/layout/TopBar";
 import { PnlChart } from "@/components/charts/PnlChart";
+import { MarketStatusBar } from "@/components/trading/MarketStatusBar";
+import { useModelDetail } from "@/hooks/useArenaData";
+import { adaptTraderModel, adaptLoan } from "@/lib/adapters";
 
 export const Route = createFileRoute("/model/$id")({
   head: ({ params }) => ({
@@ -48,8 +51,12 @@ function ScoreBar({ label, value }: { label: string; value: number }) {
 type Filter = "ALL" | "BUY" | "SELL" | "PROFITABLE" | "LOSING";
 
 function ModelDetail() {
-  const { modelId } = Route.useLoaderData();
-  const m = models.find(x => x.id === modelId)!;
+  const { modelId } = Route.useLoaderData() as { modelId: string };
+  const { data: liveData } = useModelDetail(modelId);
+
+  const liveModel = liveData?.model ? adaptTraderModel(liveData.model, liveData.trades, liveData.scores, liveData.loans) : null;
+  const m = liveModel ?? models.find(x => x.id === modelId)!;
+
   const [filter, setFilter] = useState<Filter>("ALL");
   const [openId, setOpenId] = useState<string | null>(null);
 
@@ -64,7 +71,9 @@ function ModelDetail() {
   }, [filter, m]);
 
   const rank = [...models].sort((a, b) => b.score.composite - a.score.composite).findIndex(x => x.id === m.id) + 1;
-  const modelLoans = loans.filter(l => l.modelId === m.id);
+
+  const liveLoans = liveData?.loans?.map(adaptLoan).filter(l => l.modelId === modelId) ?? [];
+  const modelLoans = liveLoans.length > 0 ? liveLoans : mockLoans.filter(l => l.modelId === m.id);
 
   return (
     <div className="min-h-screen flex flex-col scanlines">
@@ -182,6 +191,7 @@ function ModelDetail() {
           ))}
         </div>
       </div>
+      <MarketStatusBar />
     </div>
   );
 }

@@ -85,3 +85,124 @@ export interface Commentary {
   timestamp: number;
   message: string;
 }
+
+// ── Arena Backend Types (new) ─────────────────────────────
+
+export interface ArenaTraderModel {
+  id: string;
+  name: string;
+  provider: "groq" | "nim";
+  apiModel: string;
+  balance: number;
+  startingBalance: number;
+  isInsolvent: boolean;
+  isCentralBank: boolean;
+  openPositions: ArenaPosition[];
+  loans: ArenaLoan[];
+  scores: ArenaModelScores;
+}
+
+export interface ArenaPosition {
+  id: string;
+  modelId: string;
+  asset: string;
+  assetClass: "stock" | "forex" | "commodity" | "crypto";
+  direction: "long" | "short";
+  sizeUsd: number;
+  entryPrice: number;
+  currentPrice: number;
+  openedAt: string;
+  unrealizedPnl: number;
+}
+
+export interface ArenaTrade {
+  id: string;
+  modelId: string;
+  asset: string;
+  assetClass: "stock" | "forex" | "commodity" | "crypto";
+  action: "BUY" | "SELL" | "HOLD";
+  sizeUsd: number;
+  entryPrice: number;
+  exitPrice?: number;
+  realizedPnl?: number;
+  reasoning: string;
+  executedAt: string;
+  closedAt?: string;
+}
+
+export interface ArenaLoan {
+  id: string;
+  borrowerModelId: string;
+  amountRequested: number;
+  amountApproved?: number;
+  interestRate?: number;
+  purpose: string;
+  centralBankReasoning: string;
+  status: "pending" | "approved" | "rejected" | "repaid" | "defaulted";
+  requestedAt: string;
+  resolvedAt?: string;
+  dueAt?: string;
+}
+
+export interface ArenaModelScores {
+  modelId: string;
+  compositeScore: number;
+  pnlScore: number;
+  disciplineScore: number;
+  adaptabilityScore: number;
+  riskAppetiteScore: number;
+  lastEvaluatedAt: string;
+}
+
+export interface ArenaMarketSnapshot {
+  timestamp: string;
+  assets: ArenaAssetPrice[];
+  macroIndicators: ArenaMacroIndicator[];
+  newsHeadlines: string[];
+}
+
+export interface ArenaAssetPrice {
+  symbol: string;
+  name: string;
+  price: number;
+  change24h: number;
+  changePercent24h: number;
+  assetClass: "stock" | "forex" | "commodity" | "crypto";
+}
+
+export interface ArenaMacroIndicator {
+  name: string;
+  value: string;
+  lastUpdated: string;
+}
+
+export interface ArenaTradeDecision {
+  action: "BUY" | "SELL" | "HOLD" | "LOAN_REQUEST";
+  asset?: string;
+  assetClass?: "stock" | "forex" | "commodity" | "crypto";
+  sizeUsd?: number;
+  reasoning: string;
+  loanRequest?: {
+    amount: number;
+    purpose: string;
+  };
+}
+
+export interface ArenaLoanDecision {
+  approved: boolean;
+  amountApproved?: number;
+  interestRate?: number;
+  reasoning: string;
+}
+
+export interface ArenaCentralBankCommentary {
+  id: string;
+  message: string;
+  createdAt: string;
+}
+
+export interface ArenaLeaderboardEntry {
+  modelId: string;
+  rank: number;
+  compositeScore: number;
+}

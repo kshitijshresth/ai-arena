@@ -8,6 +8,7 @@ import { PnlChart } from "@/components/charts/PnlChart";
 import { LoanLedgerPanel } from "@/components/bank/LoanLedgerPanel";
 import { CommentaryFeed } from "@/components/bank/CommentaryFeed";
 import { MacroTicker } from "@/components/bank/MacroTicker";
+import { MarketStatusBar } from "@/components/trading/MarketStatusBar";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -39,6 +40,7 @@ function Dashboard() {
           <MacroTicker />
         </div>
       </div>
+      <MarketStatusBar />
     </div>
   );
 }

@@ -1,17 +1,23 @@
 import { useMemo, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { models } from "@/data/mockData";
+import { useLeaderboard } from "@/hooks/useArenaData";
+import { adaptLeaderboard } from "@/lib/adapters";
 
 const RANGES = { "1H": 4, "6H": 24, "24H": 96, "ALL": 96 } as const;
 type Range = keyof typeof RANGES;
 
 export function PnlChart({ modelIds }: { modelIds?: string[] }) {
   const [range, setRange] = useState<Range>("24H");
-  const filtered = modelIds ? models.filter(m => modelIds.includes(m.id)) : models;
+  const { data: liveData } = useLeaderboard();
+  const liveModels = liveData?.leaderboard?.length ? adaptLeaderboard(liveData.leaderboard) : null;
+  const displayModels = liveModels ?? models;
+  const filtered = modelIds ? displayModels.filter(m => modelIds.includes(m.id)) : displayModels;
 
   const data = useMemo(() => {
+    if (!filtered.length || !filtered[0]?.pnlHistory?.length) return [];
     const n = RANGES[range];
-    const len = filtered[0]?.pnlHistory.length ?? 0;
+    const len = filtered[0].pnlHistory.length;
     const start = Math.max(0, len - n);
     const points: Record<string, number | string>[] = [];
     for (let i = start; i < len; i++) {
